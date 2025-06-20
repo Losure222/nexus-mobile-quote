@@ -103,56 +103,95 @@ function removeFromQuote(i) {
 }
 
 function generatePDF() {
-  const name = document.getElementById("customerName").value || "Customer";
+  const customerName = document.getElementById("customerName").value || "Customer";
   const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
   const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
+  const quoteDate = new Date();
+  const quoteNumber = Math.floor(10000 + Math.random() * 90000); // Simple 5-digit random quote #
+  const validUntil = new Date();
+  validUntil.setDate(quoteDate.getDate() + 14);
+
   let subtotal = 0;
-
   let html = `
-  <div style="font-family:Arial; padding:20px;">
-    <img src='https://stanloautomation.com/wp-content/uploads/2024/11/cropped-stanlo_logo_2023-1-300x67.png' style='height:50px;' />
-    <h2>Quote</h2>
-    <p><strong>Account Manager:</strong> Jack West<br>
-    <strong>Contact Number:</strong> 224-386-9496<br>
-    <strong>Quote Date:</strong> ${new Date().toLocaleDateString()}<br>
-    <strong>Valid for:</strong> 14 Days</p>
+  <div style="font-family: Arial, sans-serif; font-size: 12px; padding: 20px; width: 700px;">
 
-    <table border="1" cellspacing="0" cellpadding="6" style="width:100%; border-collapse: collapse; margin-top:10px;">
-      <thead><tr>
-        <th>Details</th><th>QTY</th><th>Condition</th><th>ETA</th><th>Unit Price</th><th>Total</th>
-      </tr></thead><tbody>
+    <table style="width:100%; margin-bottom: 20px;">
+      <tr>
+        <td style="width: 60%;">
+          <img src="https://stanloautomation.com/wp-content/uploads/2024/11/cropped-stanlo_logo_2023-1-300x67.png" style="height: 50px;" />
+        </td>
+        <td style="text-align:right;">
+          <h2 style="margin:0;">Quote # <span style="color:red;">${quoteNumber}</span></h2>
+          <p style="margin: 4px 0;"><strong>Account Manager:</strong> Jack West<br>
+          <strong>Contact Number:</strong> 224-386-9496<br>
+          <strong>Quote Date:</strong> ${quoteDate.toLocaleDateString()}<br>
+          <strong>Valid for:</strong> 14 Days<br>
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <table border="1" cellspacing="0" cellpadding="6" style="width:100%; border-collapse: collapse; font-size: 12px;">
+      <thead style="background-color:#f0f0f0;">
+        <tr>
+          <th style="text-align:left;">Details</th>
+          <th>QTY</th>
+          <th>Condition</th>
+          <th>ETA</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
   `;
 
   quoteItems.forEach(item => {
     const lineTotal = item.quantity * item.price;
     subtotal += lineTotal;
-    html += `<tr>
-      <td>${item.part_number}</td>
-      <td>${item.quantity}</td>
-      <td>${item.condition}</td>
-      <td>${item.lead_time || "N/A"}</td>
-      <td>$${item.price.toFixed(2)}</td>
-      <td>$${lineTotal.toFixed(2)}</td>
-    </tr>`;
+    html += `
+      <tr>
+        <td>${item.manufacturer} ${item.part_number}</td>
+        <td style="text-align:center;">${item.quantity}</td>
+        <td style="text-align:center;">${item.condition}</td>
+        <td style="text-align:center;">${item.lead_time || 'N/A'}</td>
+        <td style="text-align:right;">$${item.price.toFixed(2)}</td>
+        <td style="text-align:right;">$${lineTotal.toFixed(2)}</td>
+      </tr>
+    `;
   });
 
   const discountAmt = subtotal * (discount / 100);
   const total = subtotal - discountAmt + shipping;
 
   html += `
-    </tbody></table>
-    <p style="margin-top:10px;">
-      <strong>Subtotal:</strong> $${subtotal.toFixed(2)}<br>
-      <strong>Shipping:</strong> $${shipping.toFixed(2)}<br>
-      <strong>Discount:</strong> -$${discountAmt.toFixed(2)}<br>
-      <strong>Total:</strong> <span style="font-size:1.3em;">$${total.toFixed(2)}</span>
-    </p>
-    <p style="margin-top:30px;font-size:small;color:gray;">
-      We accept all major credit cards, wire transfer, and Paypal.<br>
+      </tbody>
+    </table>
+
+    <table style="width: 100%; margin-top: 20px; font-size: 12px;">
+      <tr>
+        <td style="width: 60%;"></td>
+        <td style="width: 40%;">
+          <table style="width:100%;">
+            <tr><td>Subtotal:</td><td style="text-align:right;">$${subtotal.toFixed(2)}</td></tr>
+            <tr><td>Shipping:</td><td style="text-align:right;">$${shipping.toFixed(2)}</td></tr>
+            <tr><td>Discount:</td><td style="text-align:right;">-$${discountAmt.toFixed(2)}</td></tr>
+            <tr><td><strong>Total (USD):</strong></td><td style="text-align:right;"><strong>$${total.toFixed(2)}</strong></td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin-top: 40px; font-size:10px; color:gray;">
+      We accept all major credit cards, wire transfer, and PayPal.<br>
       Parts are subject to availability at time of ordering.<br>
       Stanlo Automation standard terms and conditions of business apply.
     </p>
-  </div>`;
+  </div>
+  `;
 
-  html2pdf().from(html).set({ filename: "Quote.pdf", html2canvas: { scale: 2 }, jsPDF: { format: 'a4' } }).save();
+  html2pdf().from(html).set({
+    filename: `Stanlo_Quote_${quoteNumber}.pdf`,
+    html2canvas: { scale: 2 },
+    jsPDF: { format: 'a4', orientation: 'portrait' }
+  }).save();
 }
