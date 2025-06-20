@@ -67,39 +67,37 @@ function updateQuoteBuilder() {
   let totalProfit = 0;
 
   quoteItems.forEach((item, i) => {
-  const lineTotal = item.price * item.quantity;
-  subtotal += lineTotal;
-  totalProfit += item.profit;
+    const lineTotal = item.price * item.quantity;
+    subtotal += lineTotal;
+    totalProfit += item.profit;
 
-  quoteDiv.innerHTML += `
-    <div class="quote-item">
-      <strong>${item.part_number}</strong> - ${item.manufacturer}<br>
-      Qty: ${item.quantity}, $${item.price.toFixed(2)} ea → $${lineTotal.toFixed(2)}<br>
-      Condition: ${item.condition}, Lead Time: ${item.lead_time}<br>
-      <span style="color:green;">Profit: $${item.profit.toFixed(2)} (${item.margin}%)</span><br>
-      <button onclick="removeFromQuote(${i})">Remove</button>
-    </div>
-  `;
-});
+    quoteDiv.innerHTML += `
+      <div class="quote-item">
+        <strong>${item.part_number}</strong> - ${item.manufacturer}<br>
+        Qty: ${item.quantity}, $${item.price.toFixed(2)} ea → $${lineTotal.toFixed(2)}<br>
+        Condition: ${item.condition}, Lead Time: ${item.lead_time}<br>
+        <span style="color:green;">Profit: $${item.profit.toFixed(2)} (${item.margin}%)</span><br>
+        <button onclick="removeFromQuote(${i})">Remove</button>
+      </div>
+    `;
+  });
 
   const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
   const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
+  const tariff = parseFloat(document.getElementById("tariffFee").value) || 0;
+
   const discountAmt = subtotal * (discount / 100);
-  const total = subtotal - discountAmt + shipping;
+  const total = subtotal - discountAmt + shipping + tariff;
 
   document.getElementById("quoteSummary").innerHTML = `
     <hr>
     <p>Subtotal: $${subtotal.toFixed(2)}</p>
     <p>Discount: -$${discountAmt.toFixed(2)}</p>
     <p>Shipping: $${shipping.toFixed(2)}</p>
+    <p>Tariff Fee: $${tariff.toFixed(2)}</p>
     <h3>Total: $${total.toFixed(2)}</h3>
     <p style="color:green;">Total Profit: $${totalProfit.toFixed(2)}</p>
   `;
-}
-
-function removeFromQuote(i) {
-  quoteItems.splice(i, 1);
-  updateQuoteBuilder();
 }
 
 function generatePDF() {
