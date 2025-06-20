@@ -109,3 +109,36 @@ function updateQuoteBuilder() {
     <h3>Total: $${total.toFixed(2)}</h3>
   `;
 }
+
+
+function sendQuote() {
+  const email = document.getElementById("customerEmail").value;
+  const subject = document.getElementById("emailSubject").value || "Quote from Stanlo Automation";
+  const cc = "jack@stanloautomation.com";
+  const customer = document.getElementById("customerName").value;
+  const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
+  const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
+
+  let subtotal = 0;
+  let body = `Hi ${customer || 'there'},%0D%0A%0D%0AHere is your quote:%0D%0A%0D%0A`;
+
+  quoteItems.forEach((item, index) => {
+    const lineTotal = item.quantity * item.price;
+    subtotal += lineTotal;
+    body += `Part: ${item.part_number} - ${item.manufacturer}%0D%0A`;
+    body += `Qty: ${item.quantity}, Unit: $${item.price.toFixed(2)}, Total: $${lineTotal.toFixed(2)}%0D%0A`;
+    body += `Condition: ${item.condition || 'N/A'}, Lead Time: ${item.lead_time || 'N/A'}%0D%0A%0D%0A`;
+  });
+
+  const discountAmt = subtotal * (discount / 100);
+  const total = subtotal - discountAmt + shipping;
+
+  body += `Subtotal: $${subtotal.toFixed(2)}%0D%0A`;
+  body += `Discount: -$${discountAmt.toFixed(2)}%0D%0A`;
+  body += `Shipping: $${shipping.toFixed(2)}%0D%0A`;
+  body += `Total: $${total.toFixed(2)}%0D%0A%0D%0A`;
+  body += `Thank you for choosing Stanlo Automation.%0D%0A`;
+
+  const mailtoLink = `mailto:${email}?cc=${cc}&subject=${encodeURIComponent(subject)}&body=${body}`;
+  window.location.href = mailtoLink;
+}
