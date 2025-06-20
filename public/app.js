@@ -126,13 +126,15 @@ function generatePDF() {
           </td>
         </tr>
       </table>
+
       <table style="width:100%; border-collapse: collapse;" border="1" cellspacing="0" cellpadding="5">
         <thead style="background-color:#f0f0f0;">
           <tr>
             <th>Manufacturer</th><th>Part Number</th><th>QTY</th><th>Condition</th><th>ETA</th><th>Unit Price</th><th>Total</th>
           </tr>
         </thead>
-        <tbody>`;
+        <tbody>
+  `;
 
   quoteItems.forEach(item => {
     const lineTotal = item.quantity * item.price;
@@ -146,60 +148,60 @@ function generatePDF() {
         <td>${item.lead_time || 'N/A'}</td>
         <td style="text-align:right;">$${item.price.toFixed(2)}</td>
         <td style="text-align:right;">$${lineTotal.toFixed(2)}</td>
-      </tr>`;
+      </tr>
+    `;
   });
 
   const discountAmt = subtotal * (discount / 100);
   const total = subtotal - discountAmt + shipping;
 
-  html += `</tbody></table>
-    <table style="width:100%; margin-top: 20px;">
-      <tr><td style="width:60%;"></td>
-        <td>
-          <table style="width:100%;">
-            <tr><td>Subtotal:</td><td style="text-align:right;">$${subtotal.toFixed(2)}</td></tr>
-            <tr><td>Shipping:</td><td style="text-align:right;">$${shipping.toFixed(2)}</td></tr>
-            <tr><td>Discount:</td><td style="text-align:right;">-$${discountAmt.toFixed(2)}</td></tr>
-            <tr><td><strong>Total (USD):</strong></td><td style="text-align:right;"><strong>$${total.toFixed(2)}</strong></td></tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-    <p style="margin-top: 40px; font-size:10px; color:gray;">
-      We accept all major credit cards, wire transfer, and PayPal.<br>
-      Parts are subject to availability at time of ordering.<br>
-      Stanlo Automation standard terms and conditions of business apply.
-    </p>
-  </div>`;
+  html += `
+        </tbody>
+      </table>
 
-  // Now convert to blob and share
+      <table style="width:100%; margin-top: 20px;">
+        <tr><td style="width:60%;"></td>
+          <td>
+            <table style="width:100%;">
+              <tr><td>Subtotal:</td><td style="text-align:right;">$${subtotal.toFixed(2)}</td></tr>
+              <tr><td>Shipping:</td><td style="text-align:right;">$${shipping.toFixed(2)}</td></tr>
+              <tr><td>Discount:</td><td style="text-align:right;">-$${discountAmt.toFixed(2)}</td></tr>
+              <tr><td><strong>Total (USD):</strong></td><td style="text-align:right;"><strong>$${total.toFixed(2)}</strong></td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin-top: 40px; font-size:10px; color:gray;">
+        We accept all major credit cards, wire transfer, and PayPal.<br>
+        Parts are subject to availability at time of ordering.<br>
+        Stanlo Automation standard terms and conditions of business apply.
+      </p>
+    </div>
+  `;
+
   html2pdf().from(html).outputPdf('blob').then(blob => {
     const file = new File([blob], `Stanlo_Quote_${quoteNumber}.pdf`, { type: "application/pdf" });
 
-    const emailBody = encodeURIComponent(`Hi ${customerName},\n\nYour quote is attached in the PDF below. Let me know if you'd like to get this order moving or if you need anything else.\n\nBest regards,`);
-    const emailSubject = encodeURIComponent(`Stanlo Automation Quote #${quoteNumber}`);
+    const shareText = `Hi ${customerName || 'there'},\n\nYour quote is attached in the PDF below. Let me know if you'd like to get this order moving or if you need anything else.\n\nBest regards,`;
+    const shareTitle = `Stanlo Automation Quote #${quoteNumber}`;
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       navigator.share({
-        title: `Stanlo Automation Quote #${quoteNumber}`,
-        text: `Hi ${customerName}, your quote is attached.`,
+        title: shareTitle, // Subject
+        text: shareText,   // Body
         files: [file]
       }).catch(err => {
         alert("Sharing cancelled or failed.");
         console.error(err);
       });
     } else {
-      // Fallback for email with subject + body
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
-      a.click();
-
-      // Also offer download
-      const downloadLink = document.createElement("a");
-      downloadLink.href = blobUrl;
-      downloadLink.download = `Stanlo_Quote_${quoteNumber}.pdf`;
-      downloadLink.click();
+      // Fallback for unsupported devices
+      html2pdf().from(html).set({
+        filename: `Stanlo_Quote_${quoteNumber}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: { format: 'a4', orientation: 'portrait' }
+      }).save();
     }
   });
 }
