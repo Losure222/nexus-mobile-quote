@@ -67,20 +67,20 @@ function updateQuoteBuilder() {
   let totalProfit = 0;
 
   quoteItems.forEach((item, i) => {
-    const lineTotal = item.price * item.quantity;
-    subtotal += lineTotal;
-    totalProfit += item.profit;
+  const lineTotal = item.price * item.quantity;
+  subtotal += lineTotal;
+  totalProfit += item.profit;
 
-    quoteDiv.innerHTML += `
-      <div class="quote-item">
-        <strong>${item.part_number}</strong> - ${item.manufacturer}<br>
-        Qty: ${item.quantity}, $${item.price.toFixed(2)} ea → $${lineTotal.toFixed(2)}<br>
-        Condition: ${item.condition}, Lead Time: ${item.lead_time}<br>
-        <span style="color:green;">Profit: $${item.profit.toFixed(2)} (${item.margin}%)</span><br>
-        <button onclick="removeFromQuote(${i})">Remove</button>
-      </div>
-    `;
-  });
+  quoteDiv.innerHTML += `
+    <div class="quote-item">
+      <strong>${item.part_number}</strong> - ${item.manufacturer}<br>
+      Qty: ${item.quantity}, $${item.price.toFixed(2)} ea → $${lineTotal.toFixed(2)}<br>
+      Condition: ${item.condition}, Lead Time: ${item.lead_time}<br>
+      <span style="color:green;">Profit: $${item.profit.toFixed(2)} (${item.margin}%)</span><br>
+      <button onclick="removeFromQuote(${i})">Remove</button>
+    </div>
+  `;
+});
 
   const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
   const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
