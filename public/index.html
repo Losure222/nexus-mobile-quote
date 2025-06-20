@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stanlo Mobile Quote</title>
+  <title>Create Quote</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -38,8 +38,6 @@
 
       <h3>Finalize Quote</h3>
       <form onsubmit="return false;">
-        <label>Quote #</label>
-        <input type="text" id="quoteNumber" placeholder="e.g. 20996" />
         <label>Customer Name</label>
         <input type="text" id="customerName" />
         <label>Shipping ($)</label>
@@ -52,7 +50,10 @@
       <button onclick="generatePDF()">Generate PDF</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-    <script src="app.js"></script>
+    <div id="pdfPreview" style="margin-top: 30px;"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
