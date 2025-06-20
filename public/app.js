@@ -116,20 +116,20 @@ function generatePDF() {
   <div style="font-family: Arial, sans-serif; font-size: 12px; padding: 20px; width: 700px;">
 
     <table style="width:100%; margin-bottom: 20px;">
-      <tr>
-        <td style="width: 60%;">
-          <img src="https://stanloautomation.com/wp-content/uploads/2025/03/Updated-Logo-V3.png" style="height: 60px; margin-bottom: 10px;" />
-        </td>
-        <td style="text-align:right;">
-          <h2 style="margin:0;">Quote # <span style="color:red;">${quoteNumber}</span></h2>
-          <p style="margin: 4px 0;"><strong>Account Manager:</strong> Jack West<br>
-          <strong>Contact Number:</strong> 224-386-9496<br>
-          <strong>Quote Date:</strong> ${quoteDate.toLocaleDateString()}<br>
-          <strong>Valid for:</strong> 14 Days<br>
-          </p>
-        </td>
-      </tr>
-    </table>
+  <tr>
+    <td style="width: 60%;">
+      <img src="https://stanloautomation.com/wp-content/uploads/2025/03/Updated-Logo-V3.png" style="height: 60px;" />
+    </td>
+    <td style="text-align:right;">
+      <h2 style="margin:0;">Quote # <span style="color:red;">${quoteNumber}</span></h2>
+      <p style="margin: 4px 0;"><strong>Account Manager:</strong> Jack West<br>
+      <strong>Contact Number:</strong> 224-386-9496<br>
+      <strong>Quote Date:</strong> ${quoteDate.toLocaleDateString()}<br>
+      <strong>Valid for:</strong> 14 Days<br>
+      </p>
+    </td>
+  </tr>
+</table>
 
     <table border="1" cellspacing="0" cellpadding="6" style="width:100%; border-collapse: collapse; font-size: 12px;">
       <thead style="background-color:#f0f0f0;">
