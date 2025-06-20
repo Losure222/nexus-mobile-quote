@@ -11,7 +11,7 @@ function searchParts() {
       resultsDiv.innerHTML = "";
 
       if (data && data.csv_results && data.csv_results.length) {
-        data.csv_results.forEach((part, index) => {
+        data.csv_results.forEach((part) => {
           const card = document.createElement("div");
           card.className = "part-card";
           card.innerHTML = `
@@ -76,7 +76,8 @@ function updateQuoteBuilder() {
   const quoteDiv = document.getElementById("quoteItems");
   const summaryDiv = document.getElementById("quoteSummary");
   quoteDiv.innerHTML = "";
-  let total = 0;
+  let subtotal = 0;
+
   quoteItems.forEach((item, index) => {
     const lineTotal = item.price * item.quantity;
     const div = document.createElement("div");
@@ -87,8 +88,24 @@ function updateQuoteBuilder() {
       Lead Time: ${item.lead_time || 'N/A'} | Condition: ${item.condition || 'N/A'}
       <br><button onclick="removeFromQuote(${index})">Remove</button>
     `;
-    total += lineTotal;
+    subtotal += lineTotal;
     quoteDiv.appendChild(div);
   });
-  summaryDiv.innerHTML = `<strong>Total: $${total.toFixed(2)}</strong>`;
+
+  // Calculate final total
+  const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
+  const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
+  const discountAmt = subtotal * (discount / 100);
+  const total = subtotal - discountAmt + shipping;
+
+  const customerName = document.getElementById("customerName").value;
+
+  summaryDiv.innerHTML = `
+    <hr>
+    <p><strong>Customer:</strong> ${customerName || '(Not set)'}</p>
+    <p>Subtotal: $${subtotal.toFixed(2)}</p>
+    <p>Discount: -$${discountAmt.toFixed(2)}</p>
+    <p>Shipping: $${shipping.toFixed(2)}</p>
+    <h3>Total: $${total.toFixed(2)}</h3>
+  `;
 }

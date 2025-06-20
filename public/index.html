@@ -35,6 +35,17 @@
     <div id="quoteBuilder" class="quote-builder">
       <h2>Quote Draft</h2>
       <div id="quoteItems"></div>
+
+      <h3>Finalize Quote</h3>
+      <form onsubmit="return false;">
+        <label>Customer Name</label>
+        <input type="text" id="customerName" />
+        <label>Shipping ($)</label>
+        <input type="number" id="shippingCost" step="0.01" value="0" />
+        <label>Discount (%)</label>
+        <input type="number" id="discountPercent" step="0.01" value="0" />
+      </form>
+
       <div id="quoteSummary"></div>
     </div>
   </div>
