@@ -1,1 +1,1 @@
-// JavaScript with working logic previously defined
+// JS logic is managed via HTML script blocks or external
