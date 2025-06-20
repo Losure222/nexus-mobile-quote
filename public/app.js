@@ -118,7 +118,7 @@ function generatePDF() {
     <table style="width:100%; margin-bottom: 20px;">
       <tr>
         <td style="width: 60%;">
-          <img src="https://stanloautomation.com/wp-content/uploads/2025/03/Updated-Logo-V3.png" style="height: 50px;" />
+          <img src="https://stanloautomation.com/wp-content/uploads/2025/03/Updated-Logo-V3.png" style="height: 60px; margin-bottom: 10px;" />
         </td>
         <td style="text-align:right;">
           <h2 style="margin:0;">Quote # <span style="color:red;">${quoteNumber}</span></h2>
