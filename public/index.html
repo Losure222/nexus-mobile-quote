@@ -44,16 +44,16 @@
         <input type="number" id="shippingCost" step="0.01" value="0" />
         <label>Discount (%)</label>
         <input type="number" id="discountPercent" step="0.01" value="0" />
-        <label>Customer Email</label>
-        <input type="email" id="customerEmail" />
-        <label>Email Subject</label>
-        <input type="text" id="emailSubject" placeholder="e.g. Quote from Stanlo Automation" />
       </form>
 
       <div id="quoteSummary"></div>
-      <button onclick="sendQuote()">Email Quote</button>
+      <button onclick="generatePDF()">Generate PDF</button>
     </div>
+
+    <div id="pdfPreview" style="margin-top: 30px;"></div>
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

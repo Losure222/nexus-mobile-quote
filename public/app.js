@@ -9,38 +9,26 @@ function searchParts() {
     .then(data => {
       const resultsDiv = document.getElementById("results");
       resultsDiv.innerHTML = "";
-
       if (data && data.csv_results && data.csv_results.length) {
         data.csv_results.forEach((part) => {
           const card = document.createElement("div");
-          card.className = "part-card";
-          card.innerHTML = `
-            <div class="part-header">${part.part_number} - ${part.manufacturer}</div>
-            <div class="part-subtext">
-              ${part.condition || 'N/A'}<br>
-              Price: $${part.price || 'N/A'}<br>
-              Vendor: ${part.vendor || 'N/A'} (${part.location || 'N/A'})<br>
-              Lead Time: ${part.lead_time || 'N/A'}
-            </div>
-            <button onclick='selectPart(${JSON.stringify(part)})'>Add</button>
-          `;
+          card.className = "quote-item";
+          card.innerHTML = `<strong>${part.part_number}</strong> - ${part.manufacturer}<br>
+          ${part.condition || 'N/A'}<br>Price: $${part.price || 'N/A'}<br>
+          <button onclick='selectPart(${JSON.stringify(part)})'>Add</button>`;
           resultsDiv.appendChild(card);
         });
       } else {
         resultsDiv.innerHTML = "<p>No parts found.</p>";
       }
-    })
-    .catch(err => console.error("Error:", err));
+    });
 }
 
 function selectPart(part) {
   selectedPart = part;
   document.getElementById("quoteFormContainer").style.display = "block";
   document.getElementById("selectedPartInfo").innerHTML = `
-    <strong>${part.part_number}</strong><br>
-    ${part.manufacturer} - ${part.condition || 'N/A'}<br>
-    Price: $${part.price || 'N/A'}<br>
-    Lead Time: ${part.lead_time || 'N/A'}
+    <strong>${part.part_number}</strong><br>${part.manufacturer} - ${part.condition || 'N/A'}
   `;
   document.getElementById("qtyInput").value = 1;
   document.getElementById("priceInput").value = part.price || 0;
@@ -53,92 +41,82 @@ function finalizeQuoteItem() {
   const price = parseFloat(document.getElementById("priceInput").value) || 0;
   const lead = document.getElementById("leadTimeInput").value;
   const cond = document.getElementById("conditionInput").value;
-
-  const newItem = {
-    ...selectedPart,
-    quantity: qty,
-    price: price,
-    lead_time: lead,
-    condition: cond
-  };
-  quoteItems.push(newItem);
+  quoteItems.push({ ...selectedPart, quantity: qty, price, lead_time: lead, condition: cond });
   selectedPart = null;
   document.getElementById("quoteFormContainer").style.display = "none";
   updateQuoteBuilder();
 }
 
-function removeFromQuote(index) {
-  quoteItems.splice(index, 1);
+function updateQuoteBuilder() {
+  const quoteDiv = document.getElementById("quoteItems");
+  quoteDiv.innerHTML = "";
+  quoteItems.forEach((item, i) => {
+    const total = item.price * item.quantity;
+    quoteDiv.innerHTML += `<div class="quote-item">
+      <strong>${item.part_number}</strong> - ${item.manufacturer}<br>
+      Qty: ${item.quantity}, $${item.price.toFixed(2)} ea → $${total.toFixed(2)}
+      <br>Condition: ${item.condition}, Lead Time: ${item.lead_time}
+      <br><button onclick="removeFromQuote(${i})">Remove</button>
+    </div>`;
+  });
+}
+
+function removeFromQuote(i) {
+  quoteItems.splice(i, 1);
   updateQuoteBuilder();
 }
 
-function updateQuoteBuilder() {
-  const quoteDiv = document.getElementById("quoteItems");
-  const summaryDiv = document.getElementById("quoteSummary");
-  quoteDiv.innerHTML = "";
-  let subtotal = 0;
-
-  quoteItems.forEach((item, index) => {
-    const lineTotal = item.price * item.quantity;
-    const div = document.createElement("div");
-    div.className = "quote-item";
-    div.innerHTML = `
-      <strong>${item.part_number}</strong> - ${item.manufacturer}<br>
-      Qty: ${item.quantity}, Unit: $${item.price.toFixed(2)}, Total: $${lineTotal.toFixed(2)}<br>
-      Lead Time: ${item.lead_time || 'N/A'} | Condition: ${item.condition || 'N/A'}
-      <br><button onclick="removeFromQuote(${index})">Remove</button>
-    `;
-    subtotal += lineTotal;
-    quoteDiv.appendChild(div);
-  });
-
-  // Calculate final total
+function generatePDF() {
+  const name = document.getElementById("customerName").value || "Customer";
   const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
   const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
-  const discountAmt = subtotal * (discount / 100);
-  const total = subtotal - discountAmt + shipping;
+  let subtotal = 0;
 
-  const customerName = document.getElementById("customerName").value;
+  let html = `
+  <div style="font-family:Arial; padding:20px;">
+    <img src='https://stanloautomation.com/wp-content/uploads/2024/11/cropped-stanlo_logo_2023-1-300x67.png' style='height:50px;' />
+    <h2>Quote</h2>
+    <p><strong>Account Manager:</strong> Jack West<br>
+    <strong>Contact Number:</strong> 224-386-9496<br>
+    <strong>Quote Date:</strong> ${new Date().toLocaleDateString()}<br>
+    <strong>Valid for:</strong> 14 Days</p>
 
-  summaryDiv.innerHTML = `
-    <hr>
-    <p><strong>Customer:</strong> ${customerName || '(Not set)'}</p>
-    <p>Subtotal: $${subtotal.toFixed(2)}</p>
-    <p>Discount: -$${discountAmt.toFixed(2)}</p>
-    <p>Shipping: $${shipping.toFixed(2)}</p>
-    <h3>Total: $${total.toFixed(2)}</h3>
+    <table border="1" cellspacing="0" cellpadding="6" style="width:100%; border-collapse: collapse; margin-top:10px;">
+      <thead><tr>
+        <th>Details</th><th>QTY</th><th>Condition</th><th>ETA</th><th>Unit Price</th><th>Total</th>
+      </tr></thead><tbody>
   `;
-}
 
-
-function sendQuote() {
-  const email = document.getElementById("customerEmail").value;
-  const subject = document.getElementById("emailSubject").value || "Quote from Stanlo Automation";
-  const cc = "jack@stanloautomation.com";
-  const customer = document.getElementById("customerName").value;
-  const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
-  const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
-
-  let subtotal = 0;
-  let body = `Hi ${customer || 'there'},%0D%0A%0D%0AHere is your quote:%0D%0A%0D%0A`;
-
-  quoteItems.forEach((item, index) => {
+  quoteItems.forEach(item => {
     const lineTotal = item.quantity * item.price;
     subtotal += lineTotal;
-    body += `Part: ${item.part_number} - ${item.manufacturer}%0D%0A`;
-    body += `Qty: ${item.quantity}, Unit: $${item.price.toFixed(2)}, Total: $${lineTotal.toFixed(2)}%0D%0A`;
-    body += `Condition: ${item.condition || 'N/A'}, Lead Time: ${item.lead_time || 'N/A'}%0D%0A%0D%0A`;
+    html += `<tr>
+      <td>${item.part_number}</td>
+      <td>${item.quantity}</td>
+      <td>${item.condition}</td>
+      <td>${item.lead_time || "N/A"}</td>
+      <td>$${item.price.toFixed(2)}</td>
+      <td>$${lineTotal.toFixed(2)}</td>
+    </tr>`;
   });
 
   const discountAmt = subtotal * (discount / 100);
   const total = subtotal - discountAmt + shipping;
 
-  body += `Subtotal: $${subtotal.toFixed(2)}%0D%0A`;
-  body += `Discount: -$${discountAmt.toFixed(2)}%0D%0A`;
-  body += `Shipping: $${shipping.toFixed(2)}%0D%0A`;
-  body += `Total: $${total.toFixed(2)}%0D%0A%0D%0A`;
-  body += `Thank you for choosing Stanlo Automation.%0D%0A`;
+  html += `
+    </tbody></table>
+    <p style="margin-top:10px;">
+      <strong>Subtotal:</strong> $${subtotal.toFixed(2)}<br>
+      <strong>Shipping:</strong> $${shipping.toFixed(2)}<br>
+      <strong>Discount:</strong> -$${discountAmt.toFixed(2)}<br>
+      <strong>Total:</strong> <span style="font-size:1.3em;">$${total.toFixed(2)}</span>
+    </p>
+    <p style="margin-top:30px;font-size:small;color:gray;">
+      We accept all major credit cards, wire transfer, and Paypal.<br>
+      Parts are subject to availability at time of ordering.<br>
+      Stanlo Automation standard terms and conditions of business apply.
+    </p>
+  </div>`;
 
-  const mailtoLink = `mailto:${email}?cc=${cc}&subject=${encodeURIComponent(subject)}&body=${body}`;
-  window.location.href = mailtoLink;
+  html2pdf().from(html).set({ filename: "Quote.pdf", html2canvas: { scale: 2 }, jsPDF: { format: 'a4' } }).save();
 }
