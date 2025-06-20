@@ -1,1 +1,58 @@
-<!DOCTYPE html><html><body><h1>Working v11 zip restored</h1></body></html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stanlo Mobile Quote</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Create Quote</h1>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search for part number..." />
+      <button onclick="searchParts()">Search</button>
+    </div>
+    <div id="results" class="results"></div>
+
+    <div id="quoteFormContainer" class="quote-form-container" style="display:none;">
+      <h2>Quote Item</h2>
+      <div id="selectedPartInfo"></div>
+      <form onsubmit="return false;">
+        <label>Quantity</label>
+        <input type="number" id="qtyInput" value="1" min="1" />
+        <label>Unit Price ($)</label>
+        <input type="number" id="priceInput" step="0.01" />
+        <label>Lead Time</label>
+        <input type="text" id="leadTimeInput" />
+        <label>Condition</label>
+        <input type="text" id="conditionInput" />
+        <button onclick="finalizeQuoteItem()">Add to Quote</button>
+      </form>
+    </div>
+
+    <div id="quoteBuilder" class="quote-builder">
+      <h2>Quote Draft</h2>
+      <div id="quoteItems"></div>
+
+      <h3>Finalize Quote</h3>
+      <form onsubmit="return false;">
+        <label>Quote #</label>
+        <input type="text" id="quoteNumber" placeholder="e.g. 20996" />
+        <label>Customer Name</label>
+        <input type="text" id="customerName" />
+        <label>Shipping ($)</label>
+        <input type="number" id="shippingCost" step="0.01" value="0" />
+        <label>Discount (%)</label>
+        <input type="number" id="discountPercent" step="0.01" value="0" />
+      </form>
+
+      <div id="quoteSummary"></div>
+      <button onclick="generatePDF()">Generate PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,1 +1,1 @@
-// Full JS logic was applied earlier for profit margin + PDF
+// JS logic is managed via HTML script blocks or external
