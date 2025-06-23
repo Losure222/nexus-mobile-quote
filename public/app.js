@@ -2,8 +2,10 @@ let selectedPart = null;
 const quoteItems = [];
 
 function searchParts() {
-  const query = document.getElementById("searchInput").value;
-  fetch(`https://nexus-backend-6xfb.onrender.com/parts?query=${encodeURIComponent(query)}`)
+  const rawQuery = document.getElementById("searchInput").value;
+  const normalizedQuery = rawQuery.toLowerCase().replace(/[\s\-]/g, '');
+
+  fetch(`https://nexus-backend-6xfb.onrender.com/parts?query=${encodeURIComponent(normalizedQuery)}`)
     .then(res => res.json())
     .then(data => {
       const resultsDiv = document.getElementById("results");
@@ -20,7 +22,8 @@ function searchParts() {
       } else {
         resultsDiv.innerHTML = "<p>No parts found.</p>";
       }
-    });
+    })
+    .catch(err => console.error("Error:", err));
 }
 
 function selectPart(part) {
