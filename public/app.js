@@ -24,7 +24,9 @@ function searchParts() {
       }
     })
     .catch(err => console.error("Error:", err));
+    
 }
+
 
 function selectPart(part) {
   selectedPart = part;
@@ -209,5 +211,19 @@ function generatePDF() {
 }
 
 function showManualPartForm() {
-  document.getElementById("manualPartForm").style.display = "block";
+  const form = document.getElementById("manualPartForm");
+  form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+}
+
+function submitManualPart() {
+  const part = {
+    part_number: document.getElementById("manualPartNumber").value || "Manual Entry",
+    manufacturer: document.getElementById("manualManufacturer").value || "Unknown",
+    price: parseFloat(document.getElementById("manualPrice").value) || 0,
+    condition: document.getElementById("manualCondition").value || 'N/A',
+    lead_time: document.getElementById("manualLeadTime").value || 'N/A'
+  };
+
+  selectPart(part);
+  document.getElementById("manualPartForm").style.display = "none";
 }
