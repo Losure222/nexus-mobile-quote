@@ -80,7 +80,16 @@ function updateQuoteBuilder() {
         Qty: ${item.quantity}, $${item.price.toFixed(2)} ea → $${lineTotal.toFixed(2)}<br>
         Condition: ${item.condition}, Lead Time: ${item.lead_time}<br>
         <span style="color:green;">Profit: $${item.profit.toFixed(2)} (${item.margin}%)</span><br>
+        <button onclick="showManualPartForm()">Add Manual Part</button>
         <button onclick="removeFromQuote(${i})">Remove</button>
+        <div id="manualPartForm" style="display:none; margin-top:10px;">
+        <input id="manualPartNumber" placeholder="Part Number"><br>
+        <input id="manualManufacturer" placeholder="Manufacturer"><br>
+        <input id="manualCondition" placeholder="Condition"><br>
+        <input id="manualLeadTime" placeholder="Lead Time"><br>
+        <input id="manualPrice" type="number" placeholder="Price"><br>
+        <input id="manualQty" type="number" placeholder="Quantity" value="1"><br>
+        <button onclick="addManualPart()">Add to Quote</button>
       </div>
     `;
   });
@@ -207,4 +216,25 @@ function generatePDF() {
       }).save();
     }
   });
+}
+
+function showManualPartForm() {
+  document.getElementById("manualPartForm").style.display = "block";
+}
+
+function addManualPart() {
+  const part = {
+    part_number: document.getElementById("manualPartNumber").value,
+    manufacturer: document.getElementById("manualManufacturer").value,
+    condition: document.getElementById("manualCondition").value || 'N/A',
+    lead_time: document.getElementById("manualLeadTime").value || 'N/A',
+    price: parseFloat(document.getElementById("manualPrice").value) || 0,
+    quantity: parseInt(document.getElementById("manualQty").value) || 1,
+    vendor: 'Manual Entry',
+    location: 'N/A'
+  };
+
+  selectedPart = part;
+  finalizeQuoteItem();
+  document.getElementById("manualPartForm").style.display = "none";
 }
