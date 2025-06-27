@@ -265,15 +265,13 @@ function sendStripePaymentLink() {
 
 Thanks again for your order — you can complete payment securely using the link below:
 
-${data.url}
+Click here to pay: ${data.url}
 
 Once payment is made, we’ll begin processing and provide a confirmation right away.
 
 Let me know if you have any questions.
 
-Best,  
-Jack West  
-Stanlo Automation`;
+`;
 
         const subject = encodeURIComponent("Stanlo Automation – Payment Link");
         const mailBody = encodeURIComponent(body);
