@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,10 +9,23 @@
 <body>
   <div class="container">
     <h1>Create Quote</h1>
+
     <div class="search-bar">
       <input type="text" id="searchInput" placeholder="Search for part number..." />
       <button onclick="searchParts()">Search</button>
+      <button onclick="showManualPartForm()">Add Part Manually</button>
     </div>
+
+    <!-- 🔧 Manual Part Entry Form -->
+    <div id="manualPartForm" style="display: none; margin-top: 15px;">
+      <input id="manualPartNumber" placeholder="Part Number"><br>
+      <input id="manualManufacturer" placeholder="Manufacturer"><br>
+      <input id="manualPrice" placeholder="Price" type="number" step="0.01"><br>
+      <input id="manualCondition" placeholder="Condition"><br>
+      <input id="manualLeadTime" placeholder="Lead Time"><br>
+      <button onclick="submitManualPart()">Add to Quote</button>
+    </div>
+
     <div id="results" class="results"></div>
 
     <div id="quoteFormContainer" class="quote-form-container" style="display:none;">
