@@ -263,20 +263,20 @@ function sendStripePaymentLink() {
       if (data.url) {
         const body = `Hi ${customerName},
 
-Thanks again for your order — you can complete payment securely using the link below:
+Thanks again for your order.
 
-Click here to pay: ${data.url}
+💳 You can securely complete payment at the link below:
+${data.url}
 
-Once payment is made, we’ll begin processing and provide a confirmation right away.
+Once payment is made, we’ll begin processing and send confirmation.
 
 Let me know if you have any questions.
 
-`;
+— Stanlo Automation`;
 
         const subject = encodeURIComponent("Stanlo Automation – Payment Link");
         const mailBody = encodeURIComponent(body);
 
-        // Launch default email client
         window.location.href = `mailto:?subject=${subject}&body=${mailBody}`;
       } else {
         alert("Error: could not create payment link.");
