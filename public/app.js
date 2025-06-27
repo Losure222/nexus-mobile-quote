@@ -265,3 +265,37 @@ function calculateQuoteTotal() {
   const discountAmt = subtotal * (discount / 100);
   return subtotal - discountAmt + shipping + tariff;
 }
+
+function sendStripePaymentLink() {
+  const customerName = document.getElementById("customerName").value || "Customer";
+
+  const subtotal = quoteItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
+  const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
+  const tariff = parseFloat(document.getElementById("tariffFee")?.value || 0);
+
+  const discountAmt = subtotal * (discount / 100);
+  const total = subtotal - discountAmt + shipping + tariff;
+
+  fetch("https://nexus-backend-6xfb.onrender.com/create-payment-link", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: customerName,
+      amount: parseFloat(total.toFixed(2))
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.url) {
+        navigator.clipboard.writeText(data.url);
+        alert(`Payment link copied to clipboard:\n${data.url}`);
+      } else {
+        alert("Error: could not create payment link.");
+      }
+    })
+    .catch(err => {
+      console.error("Stripe error:", err);
+      alert("Failed to send payment link.");
+    });
+}
