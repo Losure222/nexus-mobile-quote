@@ -227,3 +227,41 @@ function submitManualPart() {
   selectPart(part);
   document.getElementById("manualPartForm").style.display = "none";
 }
+
+function sendStripePaymentLink() {
+  const customerName = document.getElementById("customerName").value || "Customer";
+  const amount = calculateQuoteTotal(); // total in dollars
+  if (!amount || amount <= 0) return alert("Total must be greater than $0");
+
+  fetch('https://your-backend-url.com/create-payment-link', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: customerName,
+      amount: Math.round(amount * 100) // Stripe expects cents
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.url) {
+      navigator.clipboard.writeText(data.url);
+      alert(`Payment link copied to clipboard:\n${data.url}`);
+    } else {
+      alert("Error creating payment link.");
+    }
+  })
+  .catch(err => {
+    console.error("Stripe error:", err);
+    alert("Failed to send payment link.");
+  });
+}
+
+// Helper to calculate total quote value
+function calculateQuoteTotal() {
+  const subtotal = quoteItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const shipping = parseFloat(document.getElementById("shippingCost").value) || 0;
+  const discount = parseFloat(document.getElementById("discountPercent").value) || 0;
+  const tariff = parseFloat(document.getElementById("tariffFee")?.value || 0);
+  const discountAmt = subtotal * (discount / 100);
+  return subtotal - discountAmt + shipping + tariff;
+}
