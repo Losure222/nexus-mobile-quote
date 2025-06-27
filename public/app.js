@@ -228,6 +228,33 @@ function submitManualPart() {
   document.getElementById("manualPartForm").style.display = "none";
 }
 
+function sendStripePaymentLink() {
+  const customerName = document.getElementById("customerName").value || "Customer";
+  const amount = calculateQuoteTotal(); // total in dollars
+  if (!amount || amount <= 0) return alert("Total must be greater than $0");
+
+  fetch('https://your-backend-url.com/create-payment-link', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: customerName,
+      amount: Math.round(amount * 100) // Stripe expects cents
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.url) {
+      navigator.clipboard.writeText(data.url);
+      alert(`Payment link copied to clipboard:\n${data.url}`);
+    } else {
+      alert("Error creating payment link.");
+    }
+  })
+  .catch(err => {
+    console.error("Stripe error:", err);
+    alert("Failed to send payment link.");
+  });
+}
 
 // Helper to calculate total quote value
 function calculateQuoteTotal() {
@@ -271,7 +298,9 @@ Once payment is made, we’ll begin processing and provide a confirmation right 
 
 Let me know if you have any questions.
 
-`;
+Best,  
+Jack West  
+Stanlo Automation`;
 
         navigator.clipboard.writeText(message);
         alert("Payment link and email message copied to clipboard.");
